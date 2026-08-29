@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "EffectCam",
-  description: "Kamera browser dengan pilihan filter dan galeri lokal.",
+  description: "Kamera browser dengan banyak pilihan filter dan galeri lokal.",
 };
 
 export const viewport: Viewport = {

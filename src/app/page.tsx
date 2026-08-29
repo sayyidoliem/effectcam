@@ -13,6 +13,8 @@ import {
 const filters = [
   { name: "Asli", value: "none" },
   { name: "Hitam Putih", value: "grayscale(1) contrast(1.08)" },
+  { name: "Mono Lembut", value: "grayscale(1) contrast(.9) brightness(1.08)" },
+  { name: "Mono Tegas", value: "grayscale(1) contrast(1.45) brightness(.92)" },
   { name: "Hangat", value: "sepia(.22) saturate(1.18) brightness(1.03)" },
   {
     name: "Dingin",
@@ -21,14 +23,48 @@ const filters = [
   { name: "Film", value: "sepia(.28) contrast(.94) saturate(.86)" },
   { name: "Cerah", value: "brightness(1.08) saturate(1.14)" },
   { name: "Kontras", value: "contrast(1.28) saturate(.9)" },
+  { name: "Natural", value: "contrast(1.04) saturate(1.06) brightness(1.01)" },
+  { name: "Portrait", value: "brightness(1.06) contrast(.96) saturate(.92)" },
+  {
+    name: "Golden Hour",
+    value: "sepia(.18) saturate(1.32) brightness(1.07) hue-rotate(-8deg)",
+  },
+  {
+    name: "Sunset",
+    value: "sepia(.3) saturate(1.48) contrast(1.06) hue-rotate(-12deg)",
+  },
+  {
+    name: "Coffee",
+    value: "sepia(.42) saturate(.82) contrast(1.08) brightness(.94)",
+  },
+  {
+    name: "Vintage",
+    value: "sepia(.48) saturate(.72) contrast(.92) brightness(.96)",
+  },
+  {
+    name: "Retro",
+    value: "sepia(.3) saturate(1.35) contrast(1.12) hue-rotate(-18deg)",
+  },
+  { name: "Fade", value: "contrast(.78) saturate(.75) brightness(1.12)" },
+  { name: "Matte", value: "contrast(.82) saturate(.88) brightness(1.06)" },
+  { name: "Pastel", value: "contrast(.84) saturate(.78) brightness(1.13)" },
+  { name: "Vivid", value: "saturate(1.75) contrast(1.12)" },
+  { name: "Pop", value: "saturate(2.15) contrast(1.18) brightness(1.02)" },
+  { name: "Emerald", value: "hue-rotate(48deg) saturate(1.35) contrast(1.04)" },
+  { name: "Ocean", value: "hue-rotate(176deg) saturate(1.42) contrast(1.06)" },
+  {
+    name: "Lavender",
+    value: "hue-rotate(232deg) saturate(1.18) brightness(1.06)",
+  },
+  { name: "Rose", value: "hue-rotate(318deg) saturate(1.28) brightness(1.04)" },
+  { name: "Cyber", value: "hue-rotate(205deg) saturate(2) contrast(1.22)" },
+  { name: "Noir", value: "grayscale(1) contrast(1.62) brightness(.8)" },
+  { name: "Dramatis", value: "contrast(1.55) saturate(.72) brightness(.9)" },
+  { name: "Soft Glow", value: "brightness(1.13) contrast(.82) saturate(1.08)" },
+  { name: "Low Light", value: "brightness(1.3) contrast(1.08) saturate(.9)" },
 ] as const;
 
-type Photo = {
-  id: string;
-  url: string;
-  filterName: string;
-  createdAt: Date;
-};
+type Photo = { id: string; url: string; filterName: string; createdAt: Date };
 
 export default function HomePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -80,9 +116,8 @@ export default function HomePage() {
         error instanceof Error
           ? error.message
           : "Kamera tidak dapat digunakan.";
-      const denied = /permission|denied|notallowed/i.test(message);
       setCameraError(
-        denied
+        /permission|denied|notallowed/i.test(message)
           ? "Akses kamera ditolak. Izinkan akses kamera melalui pengaturan browser, lalu coba lagi."
           : message,
       );
@@ -93,7 +128,6 @@ export default function HomePage() {
     startCamera();
     return stopCamera;
   }, [startCamera, stopCamera]);
-
   useEffect(
     () => () =>
       photosRef.current.forEach((photo) => URL.revokeObjectURL(photo.url)),
@@ -155,7 +189,7 @@ export default function HomePage() {
             <div>
               <h1 className="text-base font-semibold tracking-tight">Kamera</h1>
               <p className="mt-0.5 text-xs text-white/55">
-                {activeFilter.name}
+                {activeFilter.name} · {filters.length} efek
               </p>
             </div>
             <button
@@ -167,7 +201,6 @@ export default function HomePage() {
               {photos.length}
             </button>
           </header>
-
           <video
             ref={videoRef}
             muted
@@ -183,7 +216,6 @@ export default function HomePage() {
           />
           <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/50 to-transparent" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-black/75 to-transparent" />
-
           {!cameraReady && (
             <div className="absolute inset-0 z-10 grid place-items-center bg-neutral-950 px-6 text-center">
               <div className="max-w-sm">
@@ -207,7 +239,6 @@ export default function HomePage() {
               </div>
             </div>
           )}
-
           <div className="relative z-10 mt-auto px-4 pb-5 sm:px-6 sm:pb-7">
             <div className="mb-6 flex gap-5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {filters.map((filter) => (
@@ -269,7 +300,6 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-
         <aside className="hidden min-h-dvh border-l border-white/10 bg-neutral-950 lg:flex lg:flex-col">
           <div className="border-b border-white/10 px-5 py-5">
             <h2 className="font-semibold">Galeri</h2>
@@ -283,7 +313,6 @@ export default function HomePage() {
           />
         </aside>
       </div>
-
       {galleryOpen && (
         <div className="fixed inset-0 z-40 flex flex-col bg-neutral-950 lg:hidden">
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
@@ -306,7 +335,6 @@ export default function HomePage() {
           />
         </div>
       )}
-
       {previewPhoto && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/95 p-4 sm:p-8">
           <button

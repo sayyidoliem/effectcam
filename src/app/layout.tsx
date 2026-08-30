@@ -3,7 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "EffectCam",
-  description: "Kamera browser dengan banyak pilihan filter dan galeri lokal.",
+  description:
+    "Browser camera with multiple filters and a local photo gallery.",
 };
 
 export const viewport: Viewport = {
@@ -17,7 +18,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );

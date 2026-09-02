@@ -63,6 +63,78 @@ const filters = [
   { id: "dramatic", value: "contrast(1.55) saturate(.72) brightness(.9)" },
   { id: "softGlow", value: "brightness(1.13) contrast(.82) saturate(1.08)" },
   { id: "lowLight", value: "brightness(1.3) contrast(1.08) saturate(.9)" },
+
+  {
+    id: "cinematic",
+    value: "contrast(1.22) saturate(.78) brightness(.94) sepia(.08)",
+  },
+  {
+    id: "tealOrange",
+    value: "contrast(1.18) saturate(1.32) hue-rotate(338deg) sepia(.12)",
+  },
+  {
+    id: "midnight",
+    value: "brightness(.72) contrast(1.35) saturate(.72) hue-rotate(188deg)",
+  },
+  {
+    id: "moonlight",
+    value: "brightness(.9) contrast(1.14) saturate(.55) hue-rotate(175deg)",
+  },
+  {
+    id: "arctic",
+    value: "brightness(1.1) contrast(.94) saturate(.72) hue-rotate(165deg)",
+  },
+  {
+    id: "tropical",
+    value: "saturate(1.62) contrast(1.08) brightness(1.04) hue-rotate(8deg)",
+  },
+  {
+    id: "peach",
+    value: "sepia(.16) saturate(1.22) brightness(1.1) hue-rotate(342deg)",
+  },
+  {
+    id: "blush",
+    value: "sepia(.1) saturate(1.16) brightness(1.08) hue-rotate(322deg)",
+  },
+  {
+    id: "honey",
+    value: "sepia(.25) saturate(1.3) brightness(1.06) hue-rotate(350deg)",
+  },
+  {
+    id: "autumn",
+    value: "sepia(.34) saturate(1.38) contrast(1.05) hue-rotate(338deg)",
+  },
+  {
+    id: "forest",
+    value: "saturate(1.2) contrast(1.12) brightness(.92) hue-rotate(38deg)",
+  },
+  {
+    id: "desert",
+    value: "sepia(.38) saturate(1.05) contrast(1.1) brightness(1.02)",
+  },
+  {
+    id: "polaroid",
+    value: "sepia(.16) saturate(.82) contrast(.88) brightness(1.12)",
+  },
+  {
+    id: "analog",
+    value: "sepia(.22) saturate(.94) contrast(1.16) brightness(.98)",
+  },
+  { id: "chrome", value: "saturate(1.48) contrast(1.32) brightness(.98)" },
+  { id: "silver", value: "grayscale(.82) contrast(1.2) brightness(1.04)" },
+  { id: "graphite", value: "grayscale(1) contrast(1.28) brightness(.88)" },
+  {
+    id: "dreamyBlue",
+    value: "brightness(1.12) contrast(.82) saturate(.92) hue-rotate(165deg)",
+  },
+  {
+    id: "neon",
+    value: "saturate(2.45) contrast(1.35) brightness(1.02) hue-rotate(18deg)",
+  },
+  {
+    id: "magenta",
+    value: "saturate(1.72) contrast(1.12) hue-rotate(292deg) brightness(1.03)",
+  },
 ] as const;
 
 type FilterId = (typeof filters)[number]["id"];
@@ -142,6 +214,26 @@ const filterId = {
   dramatic: "Dramatis",
   softGlow: "Soft Glow",
   lowLight: "Cahaya Rendah",
+  cinematic: "Sinematik",
+  tealOrange: "Teal & Orange",
+  midnight: "Tengah Malam",
+  moonlight: "Cahaya Bulan",
+  arctic: "Arktik",
+  tropical: "Tropis",
+  peach: "Persik",
+  blush: "Blush",
+  honey: "Madu",
+  autumn: "Musim Gugur",
+  forest: "Hutan",
+  desert: "Gurun",
+  polaroid: "Polaroid",
+  analog: "Analog",
+  chrome: "Chrome",
+  silver: "Perak",
+  graphite: "Grafit",
+  dreamyBlue: "Biru Mimpi",
+  neon: "Neon",
+  magenta: "Magenta",
 } satisfies Record<FilterId, string>;
 const filterEn = {
   original: "Original",
@@ -174,6 +266,26 @@ const filterEn = {
   dramatic: "Dramatic",
   softGlow: "Soft Glow",
   lowLight: "Low Light",
+  cinematic: "Cinematic",
+  tealOrange: "Teal & Orange",
+  midnight: "Midnight",
+  moonlight: "Moonlight",
+  arctic: "Arctic",
+  tropical: "Tropical",
+  peach: "Peach",
+  blush: "Blush",
+  honey: "Honey",
+  autumn: "Autumn",
+  forest: "Forest",
+  desert: "Desert",
+  polaroid: "Polaroid",
+  analog: "Analog",
+  chrome: "Chrome",
+  silver: "Silver",
+  graphite: "Graphite",
+  dreamyBlue: "Dreamy Blue",
+  neon: "Neon",
+  magenta: "Magenta",
 } satisfies Record<FilterId, string>;
 const filterZh = {
   original: "原图",
@@ -206,6 +318,26 @@ const filterZh = {
   dramatic: "戏剧",
   softGlow: "柔光",
   lowLight: "弱光",
+  cinematic: "电影感",
+  tealOrange: "青橙",
+  midnight: "午夜",
+  moonlight: "月光",
+  arctic: "北极",
+  tropical: "热带",
+  peach: "蜜桃",
+  blush: "腮红",
+  honey: "蜂蜜",
+  autumn: "秋日",
+  forest: "森林",
+  desert: "沙漠",
+  polaroid: "宝丽来",
+  analog: "模拟胶片",
+  chrome: "铬彩",
+  silver: "银色",
+  graphite: "石墨",
+  dreamyBlue: "梦幻蓝",
+  neon: "霓虹",
+  magenta: "洋红",
 } satisfies Record<FilterId, string>;
 
 const translations: Record<Language, Translation> = {

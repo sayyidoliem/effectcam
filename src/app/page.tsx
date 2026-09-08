@@ -140,7 +140,7 @@ const filters = [
 type FilterId = (typeof filters)[number]["id"];
 type Filter = (typeof filters)[number];
 type Language = "id" | "en" | "zh-CN";
-type CaptureMode = 1 | 2;
+type CaptureMode = 1 | 2 | 4;
 type Photo = {
   id: string;
   url: string;
@@ -178,6 +178,7 @@ type Translation = {
   mode: string;
   single: string;
   twoGrid: string;
+  fourGrid: string;
   shotProgress: string;
   cancelSequence: string;
   filters: Record<FilterId, string>;
@@ -371,6 +372,7 @@ const translations: Record<Language, Translation> = {
     mode: "Mode foto",
     single: "1 Foto",
     twoGrid: "2 Grid",
+    fourGrid: "4 Grid",
     shotProgress: "Foto",
     cancelSequence: "Batalkan",
     filters: filterId,
@@ -405,6 +407,7 @@ const translations: Record<Language, Translation> = {
     mode: "Photo mode",
     single: "1 Photo",
     twoGrid: "2 Grid",
+    fourGrid: "4 Grid",
     shotProgress: "Shot",
     cancelSequence: "Cancel",
     filters: filterEn,
@@ -438,6 +441,7 @@ const translations: Record<Language, Translation> = {
     mode: "拍摄模式",
     single: "单张",
     twoGrid: "双格",
+    fourGrid: "四格",
     shotProgress: "拍摄",
     cancelSequence: "取消",
     filters: filterZh,
@@ -618,6 +622,47 @@ export default function HomePage() {
     drawCover(second, outer + cellHeight + gap);
     return canvas;
   };
+  const combineFourFrames = (frames: HTMLCanvasElement[]) => {
+    if (frames.length !== 4) return null;
+    const sourceWidth = Math.min(...frames.map((frame) => frame.width));
+    const cellWidth = Math.round(sourceWidth / 2);
+    const cellHeight = Math.round((cellWidth * 3) / 4);
+    const gap = Math.max(6, Math.round(sourceWidth * 0.008));
+    const outer = gap;
+    const canvas = document.createElement("canvas");
+    canvas.width = cellWidth * 2 + gap + outer * 2;
+    canvas.height = cellHeight * 2 + gap + outer * 2;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const drawCover = (source: HTMLCanvasElement, x: number, y: number) => {
+      const sourceRatio = source.width / source.height;
+      const targetRatio = cellWidth / cellHeight;
+      let sx = 0,
+        sy = 0,
+        sw = source.width,
+        sh = source.height;
+      if (sourceRatio > targetRatio) {
+        sw = source.height * targetRatio;
+        sx = (source.width - sw) / 2;
+      } else {
+        sh = source.width / targetRatio;
+        sy = (source.height - sh) / 2;
+      }
+      ctx.drawImage(source, sx, sy, sw, sh, x, y, cellWidth, cellHeight);
+    };
+    frames.forEach((frame, index) => {
+      const column = index % 2;
+      const row = Math.floor(index / 2);
+      drawCover(
+        frame,
+        outer + column * (cellWidth + gap),
+        outer + row * (cellHeight + gap),
+      );
+    });
+    return canvas;
+  };
   const cancelGrid = () => {
     gridFramesRef.current = [];
     setGridProgress(0);
@@ -636,15 +681,19 @@ export default function HomePage() {
       addPhoto(frame, 1);
       return;
     }
-    if (gridFramesRef.current.length === 0) {
-      gridFramesRef.current = [frame];
-      setGridProgress(1);
+    const nextFrames = [...gridFramesRef.current, frame];
+    if (nextFrames.length < captureMode) {
+      gridFramesRef.current = nextFrames;
+      setGridProgress(nextFrames.length);
       return;
     }
-    const combined = combineTwoFrames(gridFramesRef.current[0], frame);
+    const combined =
+      captureMode === 2
+        ? combineTwoFrames(nextFrames[0], nextFrames[1])
+        : combineFourFrames(nextFrames);
     gridFramesRef.current = [];
     setGridProgress(0);
-    if (combined) addPhoto(combined, 2);
+    if (combined) addPhoto(combined, captureMode);
   };
   const savePhoto = (photo: Photo) => {
     const a = document.createElement("a");
@@ -766,12 +815,20 @@ export default function HomePage() {
                   <Grid2X2 className="size-4" />
                   {t.twoGrid}
                 </button>
+                <button
+                  type="button"
+                  onClick={() => changeMode(4)}
+                  className={`flex items-center gap-2 rounded-full px-3 py-2 text-xs font-medium ${captureMode === 4 ? "bg-white text-black" : "text-white/65"}`}
+                >
+                  <Grid2X2 className="size-4" />
+                  {t.fourGrid}
+                </button>
               </div>
             </div>
-            {captureMode === 2 && gridProgress === 1 && (
+            {captureMode > 1 && gridProgress > 0 && (
               <div className="mb-3 flex items-center justify-center gap-3 text-xs">
                 <span className="rounded-full bg-white px-3 py-1.5 font-semibold text-black">
-                  {t.shotProgress} 1/2
+                  {t.shotProgress} {gridProgress}/{captureMode}
                 </span>
                 <button
                   type="button"
@@ -823,9 +880,9 @@ export default function HomePage() {
                   className="relative grid size-[74px] place-items-center rounded-full border-[3px] border-white active:scale-95 disabled:opacity-40"
                 >
                   <span className="block size-[58px] rounded-full bg-white" />
-                  {captureMode === 2 && (
+                  {captureMode > 1 && (
                     <span className="absolute -right-2 -top-2 grid size-7 place-items-center rounded-full bg-white text-xs font-bold text-black">
-                      {gridProgress + 1}/2
+                      {Math.min(gridProgress + 1, captureMode)}/{captureMode}
                     </span>
                   )}
                 </button>

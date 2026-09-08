@@ -3,7 +3,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "EffectCam",
   description:
-    "Browser camera with filters, single photo, two-grid collage, and local gallery.",
+    "Browser camera with filters, single photo, two-grid and four-grid collage, and local gallery.",
 };
 export const viewport: Viewport = {
   width: "device-width",

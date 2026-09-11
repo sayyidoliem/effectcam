@@ -214,6 +214,41 @@ type FilterId = (typeof filters)[number]["id"];
 type Filter = (typeof filters)[number];
 type Language = "id" | "en" | "zh-CN";
 type CaptureMode = 1 | 2 | 4 | 6 | 8;
+type FrameId = "white" | "black" | "cream" | "gray" | "pink" | "none";
+const frames: Array<{ id: FrameId; color: string }> = [
+  { id: "white", color: "#ffffff" },
+  { id: "black", color: "#111111" },
+  { id: "cream", color: "#f3ead7" },
+  { id: "gray", color: "#737373" },
+  { id: "pink", color: "#f4b8c4" },
+  { id: "none", color: "transparent" },
+];
+const frameLabels: Record<Language, Record<FrameId, string>> = {
+  id: {
+    white: "Putih",
+    black: "Hitam",
+    cream: "Krem",
+    gray: "Abu-abu",
+    pink: "Merah Muda",
+    none: "Tanpa Frame",
+  },
+  en: {
+    white: "White",
+    black: "Black",
+    cream: "Cream",
+    gray: "Gray",
+    pink: "Pink",
+    none: "No Frame",
+  },
+  "zh-CN": {
+    white: "白色",
+    black: "黑色",
+    cream: "米色",
+    gray: "灰色",
+    pink: "粉色",
+    none: "无边框",
+  },
+};
 type Photo = {
   id: string;
   url: string;
@@ -621,7 +656,11 @@ export default function HomePage() {
   const [flash, setFlash] = useState(false);
   const [captureMode, setCaptureMode] = useState<CaptureMode>(1);
   const [gridProgress, setGridProgress] = useState(0);
+  const [frameId, setFrameId] = useState<FrameId>("white");
   const t = translations[language];
+  const selectedFrame =
+    frames.find((frame) => frame.id === frameId) ?? frames[0];
+  const frameColor = selectedFrame.color;
 
   useEffect(() => {
     const saved = localStorage.getItem(languageStorageKey);
@@ -712,8 +751,24 @@ export default function HomePage() {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     return canvas;
   };
+  const applySingleFrame = (source: HTMLCanvasElement) => {
+    if (frameId === "none") return source;
+    const border = Math.max(
+      12,
+      Math.round(Math.min(source.width, source.height) * 0.025),
+    );
+    const canvas = document.createElement("canvas");
+    canvas.width = source.width + border * 2;
+    canvas.height = source.height + border * 2;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return source;
+    ctx.fillStyle = frameColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(source, border, border);
+    return canvas;
+  };
   const addPhoto = (canvas: HTMLCanvasElement, gridCount: CaptureMode) =>
-    canvas.toBlob(
+    (gridCount === 1 ? applySingleFrame(canvas) : canvas).toBlob(
       (blob) => {
         if (!blob) return;
         const photo: Photo = {
@@ -734,14 +789,14 @@ export default function HomePage() {
   ) => {
     const width = Math.min(first.width, second.width);
     const cellHeight = Math.round((width * 3) / 4);
-    const gap = Math.max(8, Math.round(width * 0.012));
+    const gap = frameId === "none" ? 0 : Math.max(8, Math.round(width * 0.012));
     const outer = gap;
     const canvas = document.createElement("canvas");
     canvas.width = width + outer * 2;
     canvas.height = cellHeight * 2 + gap + outer * 2;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = frameId === "none" ? "#000000" : frameColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     const drawCover = (source: HTMLCanvasElement, y: number) => {
       const sourceRatio = source.width / source.height;
@@ -768,14 +823,15 @@ export default function HomePage() {
     const sourceWidth = Math.min(...frames.map((frame) => frame.width));
     const cellWidth = Math.round(sourceWidth / 2);
     const cellHeight = Math.round((cellWidth * 3) / 4);
-    const gap = Math.max(6, Math.round(sourceWidth * 0.008));
+    const gap =
+      frameId === "none" ? 0 : Math.max(6, Math.round(sourceWidth * 0.008));
     const outer = gap;
     const canvas = document.createElement("canvas");
     canvas.width = cellWidth * 2 + gap + outer * 2;
     canvas.height = cellHeight * 2 + gap + outer * 2;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = frameId === "none" ? "#000000" : frameColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     const drawCover = (source: HTMLCanvasElement, x: number, y: number) => {
       const sourceRatio = source.width / source.height;
@@ -809,14 +865,15 @@ export default function HomePage() {
     const sourceWidth = Math.min(...frames.map((frame) => frame.width));
     const cellWidth = Math.round(sourceWidth / 3);
     const cellHeight = Math.round((cellWidth * 3) / 4);
-    const gap = Math.max(5, Math.round(sourceWidth * 0.006));
+    const gap =
+      frameId === "none" ? 0 : Math.max(5, Math.round(sourceWidth * 0.006));
     const outer = gap;
     const canvas = document.createElement("canvas");
     canvas.width = cellWidth * 3 + gap * 2 + outer * 2;
     canvas.height = cellHeight * 2 + gap + outer * 2;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = frameId === "none" ? "#000000" : frameColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     const drawCover = (source: HTMLCanvasElement, x: number, y: number) => {
       const sourceRatio = source.width / source.height;
@@ -850,14 +907,15 @@ export default function HomePage() {
     const sourceWidth = Math.min(...frames.map((frame) => frame.width));
     const cellWidth = Math.round(sourceWidth / 4);
     const cellHeight = Math.round((cellWidth * 3) / 4);
-    const gap = Math.max(4, Math.round(sourceWidth * 0.005));
+    const gap =
+      frameId === "none" ? 0 : Math.max(4, Math.round(sourceWidth * 0.005));
     const outer = gap;
     const canvas = document.createElement("canvas");
     canvas.width = cellWidth * 4 + gap * 3 + outer * 2;
     canvas.height = cellHeight * 2 + gap + outer * 2;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = frameId === "none" ? "#000000" : frameColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     const drawCover = (source: HTMLCanvasElement, x: number, y: number) => {
       const sourceRatio = source.width / source.height;
@@ -1024,6 +1082,32 @@ export default function HomePage() {
             </div>
           )}
           <div className="relative z-10 mt-auto px-4 pb-5 sm:px-6 sm:pb-7">
+            <div className="mb-3 flex items-center gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <span className="shrink-0 text-xs font-medium text-white/55">
+                Frame
+              </span>
+              {frames.map((frame) => (
+                <button
+                  key={frame.id}
+                  type="button"
+                  onClick={() => setFrameId(frame.id)}
+                  aria-label={frameLabels[language][frame.id]}
+                  title={frameLabels[language][frame.id]}
+                  className={`flex shrink-0 items-center gap-2 rounded-full border px-2.5 py-1.5 text-xs transition ${frameId === frame.id ? "border-white bg-white text-black" : "border-white/20 bg-black/35 text-white/70"}`}
+                >
+                  <span
+                    className="size-3.5 rounded-full border border-white/30"
+                    style={{
+                      background:
+                        frame.id === "none"
+                          ? "linear-gradient(135deg,#fff 45%,#ef4444 46%,#ef4444 54%,#fff 55%)"
+                          : frame.color,
+                    }}
+                  />
+                  <span>{frameLabels[language][frame.id]}</span>
+                </button>
+              ))}
+            </div>
             <div className="mb-4 flex justify-center">
               <div className="flex rounded-full bg-black/50 p-1 backdrop-blur-md">
                 <button
